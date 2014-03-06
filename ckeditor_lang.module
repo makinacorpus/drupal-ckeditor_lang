@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * Implements hook_ckeditor_plugin().
+ */
+function ckeditor_lang_ckeditor_plugin() {
+  return array(
+    'ckeditorLang' => array(
+      'name' => 'ckeditorLang',
+      'desc' => t('Plugin for inserting text with "lang" attribute.'),
+      'path' => drupal_get_path('module', 'ckeditor_lang') . '/plugins/ckeditorLang/',
+      'buttons' => array(
+        'ckeditorLang' => array(
+          'icon' => 'icons/ckeditorLang.png',
+          'label' => 'Translate',
+        ),
+      ),
+    )
+  );
+}
+
+/**
+ * Implements hook_element_info_alter().
+ */
+function ckeditor_lang_element_info_alter(&$types) {
+  $types['text_format']['#pre_render'][] = 'ckeditor_lang_pre_render_text_format';
+}
+
+/**
+ * Form element pre-render callback to add additional settings needed for our
+ * plugin. Sorry, didn't find an another better way to do it.
+ */
+function ckeditor_lang_pre_render_text_format($element) {
+  static $init = FALSE;
+  if (!$init) {
+
+    // Fetch available languages, including disabled.
+    $language_options = array();
+    $languages = language_list();
+    foreach ($languages as $language) {
+      $language_options[] = array($language->name, $language->language);
+    }
+
+    // Add languages in JS settings.
+    drupal_add_js(array(
+      'ckeditor_lang' => array(
+        'language_options' => $language_options,
+      ),
+    ), 'setting');
+
+    // Once again, sorry for this :-s
+    $init = TRUE;
+  }
+
+  return $element;
+}

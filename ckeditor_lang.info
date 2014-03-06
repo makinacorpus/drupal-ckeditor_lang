@@ -1,0 +1,6 @@
+name = CKEditor language plugin
+description = "Provide a CKEditor plugin to insert text with a 'lang' property."
+package = User interface
+core = 7.x
+
+dependencies[] = ckeditor
